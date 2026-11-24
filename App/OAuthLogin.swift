@@ -5,7 +5,7 @@ import UploaderCore
 /// Special:OAuthConsumerRegistration üzerinden kaydedilir; geri dönüş adresi
 /// `OAuth.redirectURI` olmalıdır. Boşsa "Commons ile giriş yap" düğmesi gösterilmez.
 enum OAuthConfig {
-    static let clientID = ""
+    static let clientID = "8e53b4967c6c278a2a23ec723e626b2f"
     static var isAvailable: Bool { !clientID.isEmpty }
 }
 
