@@ -52,6 +52,7 @@ public struct Player: Codable, Equatable, Identifiable, Sendable {
 public struct RosterSource: Codable, Equatable, Sendable {
     public var lang: String
     public var page: String
+    public init(lang: String, page: String) { self.lang = lang; self.page = page }
 }
 
 public struct Team: Codable, Equatable, Identifiable, Sendable {
@@ -88,6 +89,7 @@ public struct ManualPlayer: Codable, Equatable, Sendable {
 public struct UploadResult: Codable, Equatable, Sendable {
     public var title: String
     public var url: String?
+    public init(title: String, url: String?) { self.title = title; self.url = url }
 }
 
 public struct PhotoRecord: Codable, Equatable, Sendable {

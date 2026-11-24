@@ -39,6 +39,14 @@ final class CoreTests: XCTestCase {
         XCTAssertEqual(Matcher.match(a, teams: teams).players.first?.name, "Ante Žižić")
     }
 
+    func testWeakSingleSightingWithoutJerseyTextIsIgnored() {
+        let weak = PhotoAnalysis(width: 3000, height: 2000, numbers: [det("41", h: 0.09, hits: 1, ["siyah": 0.8])], texts: [])
+        XCTAssertTrue(Matcher.match(weak, teams: teams).players.isEmpty)
+        let withText = PhotoAnalysis(width: 3000, height: 2000, numbers: [det("41", h: 0.0204, hits: 1, ["siyah": 0.8])],
+                                     texts: [TextDetection(text: "fuzul", box: NormalizedBox(x0: 0.39, y0: 0.53, x1: 0.47, y1: 0.55))])
+        XCTAssertEqual(Matcher.match(withText, teams: teams).players.count, 1)
+    }
+
     func testKeywordMatchingToleratesOCRErrors() {
         XCTAssertTrue(Matcher.keywordHit("BESKTAR", keywords: ["Beşiktaş"]))
         XCTAssertTrue(Matcher.keywordHit("TARfin", keywords: ["tarfin"]))

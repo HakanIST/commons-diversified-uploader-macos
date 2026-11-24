@@ -4,7 +4,7 @@ import UploaderCore
 
 // Geliştirme aracı. Kullanım: cdu-cli fixture <modelKlasörü> <png> <json>
 let args = Array(CommandLine.arguments.dropFirst())
-guard let command = args.first else { print("komut: fixture"); exit(2) }
+guard let command = args.first else { print("komutlar: fixture, analyze, roster, match"); exit(2) }
 
 func rgb(from url: URL, size: Int) -> [UInt8] {
     let src = CGImageSourceCreateWithURL(url as CFURL, nil)!
@@ -49,6 +49,14 @@ case "roster":
         sem.signal()
     }
     sem.wait()
+case "match":
+    // cdu-cli match <fotoğrafKlasörü>: kayıtlı analizleri kadroyla eşleştirip özetler
+    let project = try Project.load(folder: URL(fileURLWithPath: args[1]))
+    for (name, record) in project.photos.sorted(by: { $0.key < $1.key }) {
+        guard let analysis = record.analysis else { continue }
+        let r = Matcher.match(analysis, teams: project.match.teams)
+        print(name, r.players.map { "\($0.number) \($0.name)" }.joined(separator: ", "), r.unresolved.isEmpty ? "" : "| çözülemeyen: \(r.unresolved.map(\.number).joined(separator: ","))")
+    }
 default:
     print("bilinmeyen komut"); exit(2)
 }

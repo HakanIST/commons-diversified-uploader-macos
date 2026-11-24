@@ -9,6 +9,10 @@ public struct MatchedPlayer: Equatable, Identifiable, Sendable {
     public var box: NormalizedBox?
     public var confidence: Double?
     public var id: String { "\(team)-\(number)" }
+
+    public init(team: String, number: String, name: String, qid: String? = nil, category: String? = nil, box: NormalizedBox? = nil, confidence: Double? = nil) {
+        self.team = team; self.number = number; self.name = name; self.qid = qid; self.category = category; self.box = box; self.confidence = confidence
+    }
 }
 
 public struct UnresolvedNumber: Equatable, Sendable {
@@ -50,18 +54,26 @@ public enum Matcher {
         }
     }
 
-    private static func scores(_ det: NumberDetection, texts: [TextDetection], teams: [Team]) -> [Double] {
+    /// Numaranın hemen üstünde/altında takımın adı ya da sponsor yazısı var mı?
+    private static func jerseyTextNear(_ det: NumberDetection, texts: [TextDetection], team: Team) -> Bool {
         let b = det.box, h = b.height
-        return teams.map { team in
-            let color = team.colors.reduce(0.0) { $0 + (det.colors[$1] ?? 0) }
-            // Numaranın hemen üstünde/altında takım adı ya da sponsor yazısı var mı?
-            let near = texts.contains { t in
-                let overlapX = min(t.box.x1, b.x1 + h) - max(t.box.x0, b.x0 - h) > 0
-                let dy = min(abs(t.box.y1 - b.y0), abs(t.box.y0 - b.y1))
-                return overlapX && dy < h * 2.5 && keywordHit(t.text, keywords: team.keywords)
-            }
-            return color + (near ? 0.6 : 0)
+        return texts.contains { t in
+            let overlapX = min(t.box.x1, b.x1 + h) - max(t.box.x0, b.x0 - h) > 0
+            let dy = min(abs(t.box.y1 - b.y0), abs(t.box.y0 - b.y1))
+            return overlapX && dy < h * 2.5 && keywordHit(t.text, keywords: team.keywords)
         }
+    }
+
+    private static func scores(_ det: NumberDetection, texts: [TextDetection], teams: [Team]) -> [Double] {
+        teams.map { team in
+            let color = team.colors.reduce(0.0) { $0 + (det.colors[$1] ?? 0) }
+            return color + (jerseyTextNear(det, texts: texts, team: team) ? 0.6 : 0)
+        }
+    }
+
+    /// Yalnızca tek parçada görülen bir rakam, yanında forma yazısı yoksa güvenilmez (ör. alev ya da karanlık zeminde uydurma "1").
+    static func isWeak(_ det: NumberDetection, texts: [TextDetection], teams: [Team]) -> Bool {
+        det.hits < 2 && !teams.contains { jerseyTextNear(det, texts: texts, team: $0) }
     }
 
     private static func sameNumber(_ a: String, _ b: String) -> Bool {
@@ -71,6 +83,7 @@ public enum Matcher {
     public static func match(_ analysis: PhotoAnalysis, teams: [Team]) -> (players: [MatchedPlayer], unresolved: [UnresolvedNumber]) {
         var players: [MatchedPlayer] = [], unresolved: [UnresolvedNumber] = []
         for det in analysis.numbers where det.heightRatio >= minHeight {
+            if isWeak(det, texts: analysis.texts, teams: teams) { continue }
             let s = scores(det, texts: analysis.texts, teams: teams)
             let order = s.indices.sorted { s[$0] > s[$1] }
             let inRoster = teams.map { team in team.players.first { sameNumber($0.number, det.number) } }
