@@ -105,4 +105,27 @@ final class CoreTests: XCTestCase {
         let players = [MatchedPlayer(team: "a", number: "31", name: "Shavon Shields")]
         XCTAssertEqual(PageBuilder.title(template: "{players} {numbers} - {match} ({n})", players: players, matchTitle: "A vs B", seq: 3, ext: "jpg"), "Shavon Shields 31 - A vs B (3).jpg")
     }
+
+    func testOAuthRequestAndCallback() throws {
+        // RFC 7636 ek B'deki örnek
+        XCTAssertEqual(OAuth.challenge(for: "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"), "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM")
+        let request = OAuth.makeRequest(clientID: "abc")
+        let query = URLComponents(url: request.url, resolvingAgainstBaseURL: false)!.queryItems!
+        XCTAssertEqual(query.first { $0.name == "redirect_uri" }?.value, "tr.tall.commonsdiversifieduploader://oauth/callback")
+        XCTAssertEqual(query.first { $0.name == "code_challenge" }?.value, OAuth.challenge(for: request.verifier))
+        XCTAssertEqual(query.first { $0.name == "code_challenge_method" }?.value, "S256")
+        let ok = URL(string: "\(OAuth.redirectURI)?code=xyz&state=\(request.state)")!
+        XCTAssertEqual(try OAuth.code(from: ok, expecting: request), "xyz")
+        XCTAssertThrowsError(try OAuth.code(from: URL(string: "\(OAuth.redirectURI)?code=xyz&state=baska")!, expecting: request))
+        XCTAssertThrowsError(try OAuth.code(from: URL(string: "\(OAuth.redirectURI)?error=access_denied&state=\(request.state)")!, expecting: request))
+    }
+
+    func testStoredCredentialsStayReadable() throws {
+        let old = try JSONEncoder().encode(CommonsAuth.oauth2(token: "t"))
+        XCTAssertEqual(try JSONDecoder().decode(CommonsAuth.self, from: old), .oauth2(token: "t"))
+        let tokens = OAuthTokens(accessToken: "a", refreshToken: "r", expiresAt: Date(timeIntervalSince1970: 1_800_000_000))
+        let data = try JSONEncoder().encode(CommonsAuth.oauth(clientID: "c", tokens: tokens))
+        XCTAssertEqual(try JSONDecoder().decode(CommonsAuth.self, from: data), .oauth(clientID: "c", tokens: tokens))
+        XCTAssertTrue(tokens.needsRefresh == (tokens.expiresAt.timeIntervalSinceNow < 300))
+    }
 }

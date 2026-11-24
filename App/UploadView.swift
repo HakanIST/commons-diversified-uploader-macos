@@ -6,6 +6,7 @@ struct UploadView: View {
     @State private var botUser = ""
     @State private var botPassword = ""
     @State private var token = ""
+    @State private var signingIn = false
     @State private var confirming = false
     @State private var checking = false
 
@@ -93,20 +94,36 @@ struct UploadView: View {
             }
         } else {
             Card(title: String(localized: "Commons oturumu"), systemImage: "key") {
-                Text("Commons'ta Special:BotPasswords sayfasından \"Dosya yükle\" ve \"Sayfa oluştur, düzenle\" izinleriyle bir bot parolası oluşturun. Kimlik bilgisi bu Mac'in Anahtar Zinciri'nde saklanır.")
-                    .font(.callout).foregroundStyle(.secondary)
-                HStack {
-                    TextField("Kullanıcı@botadı", text: $botUser)
-                    SecureField("Bot parolası", text: $botPassword)
-                    Button("Oturum aç") { Task { await model.login(.botPassword(username: botUser.trimmingCharacters(in: .whitespaces), password: botPassword)); botPassword = "" } }
-                        .buttonStyle(.borderedProminent).tint(Theme.blue).disabled(botUser.isEmpty || botPassword.isEmpty)
-                }
-                HStack {
-                    SecureField("ya da OAuth 2.0 erişim belirteci (yalnızca sahibinin kullandığı uygulama)", text: $token)
-                    Button("Belirteçle aç") { Task { await model.login(.oauth2(token: token.trimmingCharacters(in: .whitespacesAndNewlines))); token = "" } }.disabled(token.isEmpty)
+                if OAuthConfig.isAvailable {
+                    Text("Wikimedia hesabınızla oturum açın. Parolanız uygulamaya verilmez; yalnızca dosya yükleme ve sayfa düzenleme izni istenir.")
+                        .font(.callout).foregroundStyle(.secondary)
+                    Button { signingIn = true; Task { await model.loginWithWikimedia(); signingIn = false } } label: {
+                        Label("Commons ile giriş yap", systemImage: "person.badge.key").padding(.horizontal, 6)
+                    }
+                    .buttonStyle(.borderedProminent).tint(Theme.blue).controlSize(.large).disabled(signingIn)
+                    DisclosureGroup("Diğer yöntemler") { manualLogin.padding(.top, 6) }.font(.callout)
+                } else {
+                    manualLogin
                 }
             }
             .textFieldStyle(.roundedBorder)
+        }
+    }
+
+    @ViewBuilder private var manualLogin: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Commons'ta Special:BotPasswords sayfasından \"Dosya yükle\" ve \"Sayfa oluştur, düzenle\" izinleriyle bir bot parolası oluşturun. Kimlik bilgisi bu Mac'in Anahtar Zinciri'nde saklanır.")
+                .font(.callout).foregroundStyle(.secondary)
+            HStack {
+                TextField("Kullanıcı@botadı", text: $botUser)
+                SecureField("Bot parolası", text: $botPassword)
+                Button("Oturum aç") { Task { await model.login(.botPassword(username: botUser.trimmingCharacters(in: .whitespaces), password: botPassword)); botPassword = "" } }
+                    .buttonStyle(.bordered).disabled(botUser.isEmpty || botPassword.isEmpty)
+            }
+            HStack {
+                SecureField("ya da OAuth 2.0 erişim belirteci (yalnızca sahibinin kullandığı uygulama)", text: $token)
+                Button("Belirteçle aç") { Task { await model.login(.oauth2(token: token.trimmingCharacters(in: .whitespacesAndNewlines))); token = "" } }.disabled(token.isEmpty)
+            }
         }
     }
 }

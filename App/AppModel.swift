@@ -116,7 +116,7 @@ final class AppModel: ObservableObject {
         if let sel = ProcessInfo.processInfo.environment["CDU_SELECT"] { selection = sel; filter = .found }
         #endif
         if let auth = Keychain.load() {
-            let client = CommonsClient(auth: auth)
+            let client = CommonsClient(auth: auth, authDidChange: { Keychain.save($0) })
             if let name = try? await client.login() { commons = client; username = name }
         }
     }
@@ -260,8 +260,19 @@ final class AppModel: ObservableObject {
 
     // MARK: Commons
 
+    private let oauthLogin = OAuthLogin()
+
+    /// Tarayıcı penceresinde Wikimedia hesabıyla oturum açar.
+    func loginWithWikimedia() async {
+        do {
+            if let auth = try await oauthLogin.signIn() { await login(auth) }
+        } catch {
+            alert = error.localizedDescription
+        }
+    }
+
     func login(_ auth: CommonsAuth) async {
-        let client = CommonsClient(auth: auth)
+        let client = CommonsClient(auth: auth, authDidChange: { Keychain.save($0) })
         do {
             username = try await client.login()
             commons = client

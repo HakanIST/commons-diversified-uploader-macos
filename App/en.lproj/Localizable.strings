@@ -140,3 +140,8 @@
 "Oturum aç" = "Log in";
 "ya da OAuth 2.0 erişim belirteci (yalnızca sahibinin kullandığı uygulama)" = "or an OAuth 2.0 access token (owner-only consumer)";
 "Belirteçle aç" = "Log in with token";
+
+/* Wikimedia login */
+"Wikimedia hesabınızla oturum açın. Parolanız uygulamaya verilmez; yalnızca dosya yükleme ve sayfa düzenleme izni istenir." = "Log in with your Wikimedia account. The app never sees your password; it only asks for permission to upload files and edit pages.";
+"Commons ile giriş yap" = "Log in with Commons";
+"Diğer yöntemler" = "Other methods";

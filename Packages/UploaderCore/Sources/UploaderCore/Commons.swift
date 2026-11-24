@@ -3,6 +3,8 @@ import Foundation
 public enum CommonsAuth: Codable, Equatable, Sendable {
     case botPassword(username: String, password: String)
     case oauth2(token: String)
+    /// "Commons ile giriş yap" akışından gelen, yenilenebilir belirteçler.
+    case oauth(clientID: String, tokens: OAuthTokens)
 }
 
 public enum UploadOutcome: Sendable {
@@ -15,27 +17,44 @@ public enum UploadOutcome: Sendable {
 public actor CommonsClient {
     public static let chunkSize = 4 * 1024 * 1024
     private let api: String
-    private let auth: CommonsAuth?
+    private var auth: CommonsAuth?
+    private let authDidChange: (@Sendable (CommonsAuth) -> Void)?
     private let session: URLSession
     private var csrf: String?
     public private(set) var username: String?
 
-    public init(auth: CommonsAuth?, api: String = "https://commons.wikimedia.org/w/api.php") {
+    /// - Parameter authDidChange: Belirteçler yenilendiğinde çağrılır; yeni değer kalıcı olarak saklanmalıdır.
+    public init(auth: CommonsAuth?, api: String = "https://commons.wikimedia.org/w/api.php", authDidChange: (@Sendable (CommonsAuth) -> Void)? = nil) {
         self.auth = auth
+        self.authDidChange = authDidChange
         self.api = api
         // Oturum çerezleri yalnızca bellekte tutulur.
         session = URLSession(configuration: .ephemeral)
     }
 
-    private func authorize(_ request: inout URLRequest) {
-        if case .oauth2(let token) = auth { request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization") }
+    private func authorize(_ request: inout URLRequest) async throws {
+        switch auth {
+        case .oauth2(let token):
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        case .oauth(let clientID, var tokens):
+            // Uzun yüklemelerde erişim belirtecinin süresi dolabilir; dolmadan yenilenir.
+            if tokens.needsRefresh, let refresh = tokens.refreshToken {
+                tokens = try await OAuth.refresh(clientID: clientID, refreshToken: refresh)
+                let updated = CommonsAuth.oauth(clientID: clientID, tokens: tokens)
+                auth = updated
+                authDidChange?(updated)
+            }
+            request.setValue("Bearer \(tokens.accessToken)", forHTTPHeaderField: "Authorization")
+        case .botPassword, nil:
+            break
+        }
     }
 
     private func get(_ params: [String: String]) async throws -> [String: Any] {
         var p = params
         p["format"] = "json"; p["formatversion"] = "2"
         var request = URLRequest(url: HTTP.query(api, p))
-        authorize(&request)
+        try await authorize(&request)
         return try await HTTP.json(request, session: session)
     }
 
@@ -46,7 +65,7 @@ public actor CommonsClient {
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded; charset=utf-8", forHTTPHeaderField: "Content-Type")
         request.httpBody = HTTP.query("https://x/", p).query(percentEncoded: true)?.data(using: .utf8)
-        authorize(&request)
+        try await authorize(&request)
         return try await HTTP.json(request, session: session)
     }
 
@@ -116,7 +135,7 @@ public actor CommonsClient {
         request.timeoutInterval = 300
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         request.httpBody = body
-        authorize(&request)
+        try await authorize(&request)
         let d = try await HTTP.json(request, session: session)
         if let e = Self.apiError(d) { throw HTTP.Failure(message: e) }
         return d["upload"] as? [String: Any] ?? [:]
