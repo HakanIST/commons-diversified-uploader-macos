@@ -1,0 +1,11 @@
+.DS_Store
+.build/
+DerivedData/
+build/
+*.xcodeproj
+xcuserdata/
+Frameworks/
+Fixtures/
+*.provisionprofile
+*.p8
+*.p12
