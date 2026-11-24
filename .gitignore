@@ -11,3 +11,5 @@ Fixtures/
 *.p12
 build-dev/
 build-mas/
+secrets.env
+*.env
