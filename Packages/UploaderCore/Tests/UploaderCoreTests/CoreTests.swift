@@ -100,4 +100,9 @@ final class CoreTests: XCTestCase {
         XCTAssertEqual(loaded.photos["a.jpg"]?.manual, [ManualPlayer(team: "a", number: "31")])
         XCTAssertEqual(loaded.match.teams.map(\.label), ["Fenerbahçe", "Beşiktaş"])
     }
+
+    func testEnglishTemplateFields() {
+        let players = [MatchedPlayer(team: "a", number: "31", name: "Shavon Shields")]
+        XCTAssertEqual(PageBuilder.title(template: "{players} {numbers} - {match} ({n})", players: players, matchTitle: "A vs B", seq: 3, ext: "jpg"), "Shavon Shields 31 - A vs B (3).jpg")
+    }
 }

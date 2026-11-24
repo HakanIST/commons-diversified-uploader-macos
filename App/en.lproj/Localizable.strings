@@ -1,0 +1,142 @@
+/* Steps and filters */
+"Adımlar" = "Steps";
+"Maç" = "Match";
+"Kadrolar" = "Rosters";
+"Fotoğraflar" = "Photos";
+"Yükleme" = "Upload";
+"Tümü" = "All";
+"Oyuncu bulundu" = "Player found";
+"Çözülemeyen numara" = "Unresolved number";
+"Oyuncu yok" = "No player";
+"Analiz edilmedi" = "Not analysed";
+
+/* Welcome and splash */
+"Forma numarasından oyuncuya, oyuncudan kategoriye" = "From jersey number to player, from player to category";
+"Maç fotoğraflarınızı Commons'a taşıyın" = "Bring your match photos to Commons";
+"Bir maçın fotoğraflarını içeren klasörü seçin. Forma numaraları bu bilgisayarda okunur,\noyuncular kadrodan bulunur ve Commons kategorileri önerilir." = "Choose the folder that holds the photos of one match. Jersey numbers are read on this computer,\nplayers are looked up in the roster and Commons categories are suggested.";
+"Klasör seç" = "Choose folder";
+"Klasör Aç…" = "Open Folder…";
+"Seç" = "Choose";
+"Maç fotoğraflarının bulunduğu klasörü seçin" = "Choose the folder that contains the match photos";
+"Klasör değiştir" = "Change folder";
+"Oturum açılmadı" = "Not logged in";
+"Durdur" = "Stop";
+"Bir sorun oluştu" = "Something went wrong";
+"Tamam" = "OK";
+
+/* Activity and errors */
+"Proje dosyası okunamadı: %@" = "Could not read the project file: %@";
+"Proje kaydedilemedi: %@" = "Could not save the project: %@";
+"Kullanıcı" = "User";
+"Kadro getirilemedi: %@" = "Could not fetch the roster: %@";
+"Model hazırlanıyor…" = "Preparing the model…";
+"Model indiriliyor (yaklaşık 1 GB): %@" = "Downloading the model (about 1 GB): %@";
+"Model yükleniyor…" = "Loading the model…";
+"Analiz başlatılamadı: %@" = "Could not start the analysis: %@";
+"Denetim yapılamadı: %@" = "Could not run the check: %@";
+"Yükleme başlıyor…" = "Starting the upload…";
+"Maç kategorisi oluşturulamadı: %@" = "Could not create the match category: %@";
+"Yüklendi, ancak görünen kişiler eklenemedi: %@" = "Uploaded, but the depicted people could not be added: %@";
+"Arama yapılamadı: %@" = "Search failed: %@";
+
+/* Match */
+"%@ · %lld fotoğraf" = "%1$@ · %2$lld photos";
+"Maç ve yükleme bilgileri" = "Match and upload details";
+"Maç başlığı (dosya adında ve açıklamada kullanılır)" = "Match title (used in file names and descriptions)";
+"Maç kategorisi (boşsa takım kategorileri kullanılır)" = "Match category (team categories are used when empty)";
+"Kategori adı" = "Category name";
+"Maç kategorisi Commons'ta yoksa takım kategorilerinin altında oluştur" = "Create the match category under the team categories if it does not exist on Commons";
+"Tüm fotoğraflara eklenecek diğer kategoriler (satır başına bir tane)" = "Other categories to add to every photo (one per line)";
+"Dosya adı şablonu — {oyuncular} {numaralar} {maç} {sıra}" = "File name template — {players} {numbers} {match} {n}";
+"Yazar (boşsa Commons kullanıcı adınız)" = "Author (your Commons user name when empty)";
+"[[User:Ad|Ad]]" = "[[User:Name|Name]]";
+"Lisans" = "License";
+"CC0 (kamu malı)" = "CC0 (public domain)";
+"%lld. takım" = "Team %lld";
+"Takım ara (ör. Fenerbahçe basketbol)" = "Search for a team (e.g. Fenerbahçe basketball)";
+"Ara" = "Search";
+"Sonuç yok" = "No results";
+"%lld oyuncu · %@" = "%1$lld players · %2$@";
+"Commons kategorisi yok" = "no Commons category";
+"Bu maçtaki forma renkleri" = "Jersey colours in this match";
+"Formadaki yazılar (takım adı, sponsor; virgülle)" = "Text on the jersey (team name, sponsor; comma separated)";
+"Takımın Commons kategorisi" = "Commons category of the team";
+
+/* Colours */
+"siyah" = "black";
+"beyaz" = "white";
+"gri" = "grey";
+"kırmızı" = "red";
+"turuncu" = "orange";
+"sarı" = "yellow";
+"yeşil" = "green";
+"turkuaz" = "turquoise";
+"mavi" = "blue";
+"lacivert" = "navy";
+"mor" = "purple";
+"pembe" = "pink";
+"bordo" = "maroon";
+
+/* Rosters */
+"Takım seçilmedi" = "No team selected";
+"Vikipedi'den yenile" = "Refresh from Wikipedia";
+"Oyuncu ekle" = "Add player";
+"Kaynak: %@.wikipedia.org — %@. Maç günündeki kadroyla karşılaştırıp düzeltin." = "Source: %1$@.wikipedia.org — %2$@. Compare with the match-day squad and correct it.";
+"Kadro boş. \"Maç\" adımından takımı seçin ya da oyuncuları elle ekleyin." = "The roster is empty. Pick the team in the \"Match\" step or add players by hand.";
+"No" = "No.";
+"Oyuncu" = "Player";
+"Commons kategorisi" = "Commons category";
+"Ad Soyad" = "Full name";
+"kategori yok" = "no category";
+
+/* Photos */
+"Analiz et (%lld)" = "Analyse (%lld)";
+"Tümü analiz edildi" = "All analysed";
+"Bu süzgeçte fotoğraf yok." = "No photos in this filter.";
+"Oyuncu bulunamadı" = "No player found";
+"Analiz bekliyor" = "Waiting for analysis";
+"Yüklendi" = "Uploaded";
+"Hata" = "Error";
+"Bu fotoğrafı yükle" = "Upload this photo";
+"Commons dosya adı" = "Commons file name";
+"Şablondaki ada dön" = "Revert to the template name";
+"Kategoriler" = "Categories";
+"Kategori yok: maç ya da takım kategorisi girin." = "No category: enter a match or team category.";
+"Analiz hatası: %@" = "Analysis error: %@";
+"Yeniden analiz et" = "Analyse again";
+"Ayrıntı için bir fotoğraf seçin." = "Select a photo to see the details.";
+"Oyuncular (elle düzenlendi)" = "Players (edited by hand)";
+"Oyuncular" = "Players";
+"Otomatiğe dön" = "Back to automatic";
+"Oyuncu yok." = "No players.";
+"· güven %%%lld" = "· confidence %lld%%";
+"· kategorisi yok" = "· no category";
+"Oyuncu seç" = "Choose player";
+"Ekle" = "Add";
+
+/* Upload */
+"yüklenecek" = "to upload";
+"yüklendi" = "uploaded";
+"hatalı" = "failed";
+"hariç tutuldu" = "excluded";
+"Kategorileri ve dosya adlarını denetle" = "Check categories and file names";
+"%lld fotoğrafı yükle" = "Upload %lld photos";
+"Örnek sayfa metni: %@" = "Sample page text: %@";
+"Sonuçlar" = "Results";
+"%lld fotoğraf %@ hesabıyla Wikimedia Commons'a herkese açık olarak yüklenecek." = "%1$lld photos will be uploaded publicly to Wikimedia Commons with the account %2$@.";
+"Yükle" = "Upload";
+"Vazgeç" = "Cancel";
+"Yüklenen dosyalar seçtiğiniz özgür lisansla yayımlanır; bu işlem geri alınamaz." = "Uploaded files are published under the free licence you chose; this cannot be undone.";
+"Tüm kategoriler Commons'ta mevcut." = "All categories exist on Commons.";
+"Commons'ta bulunmayan kategoriler (%lld):" = "Categories missing on Commons (%lld):";
+"Dosya adları kullanılabilir." = "The file names are available.";
+"Bu adlarla dosya zaten var (%lld):" = "Files with these names already exist (%lld):";
+"Commons oturumu: " = "Commons account: ";
+"Oturumu kapat" = "Log out";
+"Commons oturumu" = "Commons login";
+"Commons'ta Special:BotPasswords sayfasından \"Dosya yükle\" ve \"Sayfa oluştur, düzenle\" izinleriyle bir bot parolası oluşturun. Kimlik bilgisi bu Mac'in Anahtar Zinciri'nde saklanır." = "On Commons, create a bot password at Special:BotPasswords with the \"Upload new files\" and \"Create, edit, and move pages\" grants. The credentials are stored in this Mac's Keychain.";
+"Kullanıcı@botadı" = "User@botname";
+"Bot parolası" = "Bot password";
+"Oturum aç" = "Log in";
+"ya da OAuth 2.0 erişim belirteci (yalnızca sahibinin kullandığı uygulama)" = "or an OAuth 2.0 access token (owner-only consumer)";
+"Belirteçle aç" = "Log in with token";

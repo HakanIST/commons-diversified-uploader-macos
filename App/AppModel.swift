@@ -7,7 +7,7 @@ enum Step: String, CaseIterable, Identifiable {
     case match, roster, photos, upload
     var id: String { rawValue }
     var title: String {
-        switch self { case .match: "Maç"; case .roster: "Kadrolar"; case .photos: "Fotoğraflar"; case .upload: "Yükleme" }
+        switch self { case .match: String(localized: "Maç"); case .roster: String(localized: "Kadrolar"); case .photos: String(localized: "Fotoğraflar"); case .upload: String(localized: "Yükleme") }
     }
     var icon: String {
         switch self { case .match: "sportscourt"; case .roster: "person.3"; case .photos: "photo.on.rectangle.angled"; case .upload: "arrow.up.circle" }
@@ -18,7 +18,7 @@ enum PhotoFilter: String, CaseIterable, Identifiable {
     case all, found, unresolved, none, pending
     var id: String { rawValue }
     var title: String {
-        switch self { case .all: "Tümü"; case .found: "Oyuncu bulundu"; case .unresolved: "Çözülemeyen numara"; case .none: "Oyuncu yok"; case .pending: "Analiz edilmedi" }
+        switch self { case .all: String(localized: "Tümü"); case .found: String(localized: "Oyuncu bulundu"); case .unresolved: String(localized: "Çözülemeyen numara"); case .none: String(localized: "Oyuncu yok"); case .pending: String(localized: "Analiz edilmedi") }
     }
     func matches(_ r: PhotoRow) -> Bool {
         switch self {
@@ -92,8 +92,8 @@ final class AppModel: ObservableObject {
         let panel = NSOpenPanel()
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
-        panel.prompt = "Seç"
-        panel.message = "Maç fotoğraflarının bulunduğu klasörü seçin"
+        panel.prompt = String(localized: "Seç")
+        panel.message = String(localized: "Maç fotoğraflarının bulunduğu klasörü seçin")
         guard panel.runModal() == .OK, let url = panel.url else { return }
         if let data = try? url.bookmarkData(options: .withSecurityScope) { UserDefaults.standard.set(data, forKey: "folderBookmark") }
         open(url)
@@ -133,7 +133,7 @@ final class AppModel: ObservableObject {
             selection = rows.first?.name
             check = nil
         } catch {
-            alert = "Proje dosyası okunamadı: \(error.localizedDescription)"
+            alert = String(localized: "Proje dosyası okunamadı: \(error.localizedDescription)")
         }
     }
 
@@ -144,7 +144,7 @@ final class AppModel: ObservableObject {
         saveTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: 600_000_000)
             guard !Task.isCancelled, let self, let folder = self.folder else { return }
-            do { try self.project.save(folder: folder) } catch { self.alert = "Proje kaydedilemedi: \(error.localizedDescription)" }
+            do { try self.project.save(folder: folder) } catch { self.alert = String(localized: "Proje kaydedilemedi: \(error.localizedDescription)") }
         }
     }
 
@@ -188,7 +188,7 @@ final class AppModel: ObservableObject {
 
     func wikitext(for row: PhotoRow) -> String {
         let m = project.match
-        let user = username ?? "Kullanıcı"
+        let user = username ?? String(localized: "Kullanıcı")
         return PageBuilder.wikitext(descriptionTr: PageBuilder.describe(row.players, matchTitle: m.title, lang: "tr"),
                                     descriptionEn: PageBuilder.describe(row.players, matchTitle: m.title, lang: "en"),
                                     date: row.date, author: m.author.isEmpty ? "[[User:\(user)|\(user)]]" : m.author, license: m.license, categories: row.categories)
@@ -209,7 +209,7 @@ final class AppModel: ObservableObject {
             if team.keywords.isEmpty { team.keywords = [short] }
             project.match.teams[i] = team
         } catch {
-            alert = "Kadro getirilemedi: \(error.localizedDescription)"
+            alert = String(localized: "Kadro getirilemedi: \(error.localizedDescription)")
         }
     }
 
@@ -219,17 +219,17 @@ final class AppModel: ObservableObject {
         guard !isBusy, let folder else { return }
         let names = rows.filter { only?.contains($0.name) ?? !$0.analyzed }.map(\.name)
         guard !names.isEmpty else { return }
-        activity = ActivityState(kind: .download, message: "Model hazırlanıyor…", fraction: nil)
+        activity = ActivityState(kind: .download, message: String(localized: "Model hazırlanıyor…"), fraction: nil)
         task = Task {
             do {
                 let dir = ProcessInfo.processInfo.environment["CDU_MODEL_DIR"].map { URL(fileURLWithPath: $0) } ?? ModelStore.defaultDirectory
                 if !FlorenceOCR.isInstalled(at: dir) {
                     try await ModelStore.ensure(at: dir) { fraction, file in
-                        Task { @MainActor in self.activity = ActivityState(kind: .download, message: "Model indiriliyor (yaklaşık 1 GB): \(file)", fraction: fraction) }
+                        Task { @MainActor in self.activity = ActivityState(kind: .download, message: String(localized: "Model indiriliyor (yaklaşık 1 GB): \(file)"), fraction: fraction) }
                     }
                 }
                 if ocr == nil {
-                    activity = ActivityState(kind: .analysis, message: "Model yükleniyor…", fraction: nil)
+                    activity = ActivityState(kind: .analysis, message: String(localized: "Model yükleniyor…"), fraction: nil)
                     ocr = try await Task.detached { try FlorenceOCR(modelDirectory: dir) }.value
                 }
                 let analyzer = ImageAnalyzer(ocr: ocr!)
@@ -250,7 +250,7 @@ final class AppModel: ObservableObject {
                     }
                 }
             } catch {
-                alert = "Analiz başlatılamadı: \(error.localizedDescription)"
+                alert = String(localized: "Analiz başlatılamadı: \(error.localizedDescription)")
             }
             activity = nil
         }
@@ -285,7 +285,7 @@ final class AppModel: ObservableObject {
             let ex = try await client.existing(cats.map { "Category:\($0)" } + ready.map { "File:\($0.title)" })
             check = UploadCheck(missingCategories: cats.filter { ex["Category:\($0)"] != true }, takenTitles: ready.map(\.title).filter { ex["File:\($0)"] == true })
         } catch {
-            alert = "Denetim yapılamadı: \(error.localizedDescription)"
+            alert = String(localized: "Denetim yapılamadı: \(error.localizedDescription)")
         }
     }
 
@@ -293,7 +293,7 @@ final class AppModel: ObservableObject {
         guard !isBusy, let commons, let folder else { return }
         let list = readyRows
         let match = project.match
-        activity = ActivityState(kind: .upload, message: "Yükleme başlıyor…", fraction: 0)
+        activity = ActivityState(kind: .upload, message: String(localized: "Yükleme başlıyor…"), fraction: 0)
         task = Task {
             do {
                 if match.createCategory, !match.category.isEmpty, try await commons.existing(["Category:\(match.category)"])["Category:\(match.category)"] != true {
@@ -301,14 +301,14 @@ final class AppModel: ObservableObject {
                     try await commons.createCategory(match.category, text: parents + "\n")
                 }
             } catch {
-                alert = "Maç kategorisi oluşturulamadı: \(error.localizedDescription)"
+                alert = String(localized: "Maç kategorisi oluşturulamadı: \(error.localizedDescription)")
             }
             for (i, row) in list.enumerated() {
                 if Task.isCancelled { break }
                 let total = Double(list.count)
                 activity = ActivityState(kind: .upload, message: "\(row.title) (\(i + 1)/\(list.count))", fraction: Double(i) / total)
                 do {
-                    let outcome = try await commons.upload(file: folder.appendingPathComponent(row.name), filename: row.title, text: wikitext(for: row), comment: "Commons Diversified Uploader ile yüklendi") { fraction in
+                    let outcome = try await commons.upload(file: folder.appendingPathComponent(row.name), filename: row.title, text: wikitext(for: row), comment: "Uploaded with Commons Diversified Uploader") { fraction in
                         Task { @MainActor in self.activity = ActivityState(kind: .upload, message: "\(row.title) (\(i + 1)/\(list.count))", fraction: (Double(i) + fraction) / total) }
                     }
                     switch outcome {
@@ -317,7 +317,7 @@ final class AppModel: ObservableObject {
                         project.photos[row.name]?.uploadError = nil
                         if let pageID {
                             do { try await commons.addDepicts(pageID: pageID, qids: row.players.compactMap(\.qid)) } catch {
-                                project.photos[row.name]?.uploadError = "Yüklendi, ancak görünen kişiler eklenemedi: \(error.localizedDescription)"
+                                project.photos[row.name]?.uploadError = String(localized: "Yüklendi, ancak görünen kişiler eklenemedi: \(error.localizedDescription)")
                             }
                         }
                     case .blocked(let reason):

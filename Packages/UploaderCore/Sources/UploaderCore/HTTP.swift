@@ -20,13 +20,13 @@ public enum HTTP {
     static func json(_ request: URLRequest, session: URLSession = .shared, retries: Int = 3) async throws -> [String: Any] {
         var request = request
         request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
-        var last: Error = Failure(message: "İstek başarısız")
+        var last: Error = Failure(message: L("İstek başarısız"))
         for attempt in 0...retries {
             do {
                 let (data, response) = try await session.data(for: request)
                 let status = (response as? HTTPURLResponse)?.statusCode ?? 0
                 if status == 429 || status >= 500 { throw Failure(message: "HTTP \(status)") }
-                guard let obj = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { throw Failure(message: "Beklenmeyen yanıt") }
+                guard let obj = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { throw Failure(message: L("Beklenmeyen yanıt")) }
                 if let code = (obj["error"] as? [String: Any])?["code"] as? String, code == "maxlag" || code == "ratelimited" { throw Failure(message: code) }
                 return obj
             } catch is CancellationError {

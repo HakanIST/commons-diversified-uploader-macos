@@ -55,6 +55,12 @@ The model (about 1 GB) is downloaded from Hugging Face on first use.
 Commit messages follow the
 [Wikimedia commit message guidelines](https://www.mediawiki.org/wiki/Gerrit/Commit_message_guidelines).
 
+## Localisation
+
+The interface is available in Turkish (source language) and English. The
+keys are the Turkish strings; translations live in `App/en.lproj` and in
+`Packages/UploaderCore/Sources/UploaderCore/Resources/en.lproj`.
+
 ## Privacy
 
 The app talks only to Wikimedia sites (Commons, Wikidata, Wikipedia) and, once,

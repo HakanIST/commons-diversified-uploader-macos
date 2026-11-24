@@ -36,13 +36,13 @@ struct UploadView: View {
                     if let c = model.check { checkResult(c) }
                 }
                 if let first = ready.first {
-                    Card(title: "Örnek sayfa metni: \(first.title)", systemImage: "doc.plaintext") {
+                    Card(title: String(localized: "Örnek sayfa metni: \(first.title)"), systemImage: "doc.plaintext") {
                         Text(model.wikitext(for: first)).font(.system(.callout, design: .monospaced)).textSelection(.enabled)
                             .padding(10).frame(maxWidth: .infinity, alignment: .leading).background(.background, in: RoundedRectangle(cornerRadius: 8))
                     }
                 }
                 if !done.isEmpty || !failed.isEmpty {
-                    Card(title: "Sonuçlar", systemImage: "list.bullet.rectangle") {
+                    Card(title: String(localized: "Sonuçlar"), systemImage: "list.bullet.rectangle") {
                         ForEach(failed) { r in Label("\(r.name): \(r.uploadError ?? "")", systemImage: "xmark.octagon").foregroundStyle(.red).font(.callout) }
                         ForEach(done) { r in
                             if let s = r.uploaded?.url, let url = URL(string: s) { Link(r.uploaded?.title ?? r.title, destination: url).font(.callout) } else { Text(r.uploaded?.title ?? r.title).font(.callout) }
@@ -58,7 +58,7 @@ struct UploadView: View {
         } message: { Text("Yüklenen dosyalar seçtiğiniz özgür lisansla yayımlanır; bu işlem geri alınamaz.") }
     }
 
-    private func stat(_ value: Int, _ label: String, _ color: some ShapeStyle) -> some View {
+    private func stat(_ value: Int, _ label: LocalizedStringKey, _ color: some ShapeStyle) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("\(value)").font(.system(size: 28, weight: .semibold, design: .rounded)).foregroundStyle(color)
             Text(label).font(.caption).foregroundStyle(.secondary)
@@ -92,7 +92,7 @@ struct UploadView: View {
                 }
             }
         } else {
-            Card(title: "Commons oturumu", systemImage: "key") {
+            Card(title: String(localized: "Commons oturumu"), systemImage: "key") {
                 Text("Commons'ta Special:BotPasswords sayfasından \"Dosya yükle\" ve \"Sayfa oluştur, düzenle\" izinleriyle bir bot parolası oluşturun. Kimlik bilgisi bu Mac'in Anahtar Zinciri'nde saklanır.")
                     .font(.callout).foregroundStyle(.secondary)
                 HStack {

@@ -62,7 +62,7 @@ struct RootView: View {
         HStack(spacing: 8) {
             Image(systemName: model.username == nil ? "person.crop.circle.badge.questionmark" : "person.crop.circle.fill")
                 .foregroundStyle(model.username == nil ? AnyShapeStyle(.secondary) : AnyShapeStyle(Theme.blue))
-            Text(model.username ?? "Oturum açılmadı").font(.callout).lineLimit(1)
+            Text(model.username ?? String(localized: "Oturum açılmadı")).font(.callout).lineLimit(1)
             Spacer()
         }
         .padding(12)

@@ -9,7 +9,7 @@ struct PhotosView: View {
         VStack(spacing: 0) {
             HStack(spacing: 10) {
                 Button { model.startAnalysis() } label: {
-                    Label(model.pendingCount > 0 ? "Analiz et (\(model.pendingCount))" : "Tümü analiz edildi", systemImage: "sparkle.magnifyingglass")
+                    Label(model.pendingCount > 0 ? String(localized: "Analiz et (\(model.pendingCount))") : String(localized: "Tümü analiz edildi"), systemImage: "sparkle.magnifyingglass")
                 }
                 .buttonStyle(.borderedProminent).tint(Theme.blue).disabled(model.isBusy || model.pendingCount == 0)
                 Spacer()
@@ -52,7 +52,7 @@ struct PhotoCard: View {
                 .clipped()
                 .overlay(alignment: .topTrailing) { status.padding(6) }
             VStack(alignment: .leading, spacing: 2) {
-                Text(row.players.isEmpty ? (row.analyzed ? "Oyuncu bulunamadı" : "Analiz bekliyor") : row.players.map { "\($0.number) \($0.name)" }.joined(separator: ", "))
+                Text(row.players.isEmpty ? (row.analyzed ? String(localized: "Oyuncu bulunamadı") : String(localized: "Analiz bekliyor")) : row.players.map { "\($0.number) \($0.name)" }.joined(separator: ", "))
                     .font(.callout.weight(.medium)).lineLimit(1).foregroundStyle(row.players.isEmpty ? .secondary : .primary)
                 HStack(spacing: 4) {
                     Text(row.name).font(.caption).foregroundStyle(.secondary)
@@ -72,7 +72,7 @@ struct PhotoCard: View {
         if row.uploaded != nil { tag("Yüklendi", .green) } else if row.uploadError != nil { tag("Hata", .red) }
     }
 
-    private func tag(_ text: String, _ color: Color) -> some View {
+    private func tag(_ text: LocalizedStringKey, _ color: Color) -> some View {
         Text(text).font(.caption2.weight(.semibold)).padding(.horizontal, 6).padding(.vertical, 2).background(color, in: Capsule()).foregroundStyle(.white)
     }
 }

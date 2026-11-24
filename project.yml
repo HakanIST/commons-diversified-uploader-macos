@@ -4,6 +4,7 @@ options:
   deploymentTarget:
     macOS: "14.0"
   createIntermediateGroups: true
+  developmentLanguage: tr
 packages:
   UploaderCore:
     path: Packages/UploaderCore
@@ -23,6 +24,7 @@ targets:
         SWIFT_VERSION: "5.0"
         ARCHS: arm64
         GENERATE_INFOPLIST_FILE: YES
+        SWIFT_EMIT_LOC_STRINGS: YES
         INFOPLIST_KEY_CFBundleDisplayName: Commons Diversified Uploader
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.photography
         INFOPLIST_KEY_NSHumanReadableCopyright: "Apache License 2.0"

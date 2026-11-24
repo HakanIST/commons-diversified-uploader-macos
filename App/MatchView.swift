@@ -23,7 +23,7 @@ struct MatchView: View {
                         TeamCard(index: index, teamKey: team.key)
                     }
                 }
-                Card(title: "Maç ve yükleme bilgileri", systemImage: "text.badge.checkmark") {
+                Card(title: String(localized: "Maç ve yükleme bilgileri"), systemImage: "text.badge.checkmark") {
                     Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 12) {
                         GridRow {
                             field("Maç başlığı (dosya adında ve açıklamada kullanılır)") {
@@ -69,7 +69,7 @@ struct MatchView: View {
         }
     }
 
-    private func field<V: View>(_ label: String, @ViewBuilder content: () -> V) -> some View {
+    private func field<V: View>(_ label: LocalizedStringKey, @ViewBuilder content: () -> V) -> some View {
         VStack(alignment: .leading, spacing: 5) { FieldLabel(label); content() }
     }
 }
@@ -86,7 +86,7 @@ struct TeamCard: View {
     private var binding: Binding<Team> { $model.project.match.teams[model.teamIndex(teamKey)] }
 
     var body: some View {
-        Card(title: team.label.isEmpty ? "\(index + 1). takım" : team.label, systemImage: "tshirt") {
+        Card(title: team.label.isEmpty ? String(localized: "\(index + 1). takım") : team.label, systemImage: "tshirt") {
             HStack {
                 TextField("Takım ara (ör. Fenerbahçe basketbol)", text: $query).onSubmit(search)
                 Button("Ara", action: search).disabled(query.isEmpty || loading)
@@ -114,12 +114,12 @@ struct TeamCard: View {
                 .background(.background, in: RoundedRectangle(cornerRadius: 8)).overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(.separator))
             }
             if team.qid != nil {
-                Text("\(team.players.count) oyuncu · \(team.category.isEmpty ? "Commons kategorisi yok" : team.category)").font(.caption).foregroundStyle(.secondary)
+                Text("\(team.players.count) oyuncu · \(team.category.isEmpty ? String(localized: "Commons kategorisi yok") : team.category)").font(.caption).foregroundStyle(.secondary)
             }
             FieldLabel("Bu maçtaki forma renkleri")
             FlowLayout(spacing: 6) {
                 ForEach(JerseyColor.names, id: \.self) { color in
-                    Chip(text: color, color: Theme.swatch(color), selected: team.colors.contains(color))
+                    Chip(text: String(localized: String.LocalizationValue(color)), color: Theme.swatch(color), selected: team.colors.contains(color))
                         .onTapGesture {
                             if team.colors.contains(color) { binding.wrappedValue.colors.removeAll { $0 == color } } else { binding.wrappedValue.colors.append(color) }
                         }
@@ -139,7 +139,7 @@ struct TeamCard: View {
         guard !query.isEmpty else { return }
         loading = true
         Task {
-            do { results = try await Wikidata.search(query) } catch { model.alert = "Arama yapılamadı: \(error.localizedDescription)" }
+            do { results = try await Wikidata.search(query) } catch { model.alert = String(localized: "Arama yapılamadı: \(error.localizedDescription)") }
             loading = false
         }
     }

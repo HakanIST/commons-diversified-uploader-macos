@@ -117,7 +117,7 @@ public final class ImageAnalyzer {
     public func analyze(_ url: URL, grid: (cols: Int, rows: Int) = (3, 2)) throws -> PhotoAnalysis {
         guard let image = ImageLoader.load(url, maxPixel: Self.workLongSide),
               let full = RGBImage(cgImage: image, width: image.width, height: image.height) else {
-            throw OrtError(description: "Görüntü açılamadı: \(url.lastPathComponent)")
+            throw OrtError(description: L("Görüntü açılamadı: \(url.lastPathComponent)"))
         }
         let W = image.width, H = image.height
         let (cols, rows) = W >= H ? grid : (grid.rows, grid.cols)

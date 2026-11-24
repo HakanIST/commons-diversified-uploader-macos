@@ -61,7 +61,7 @@ public enum Wikidata {
     }
 
     public static func team(_ qid: String) async throws -> TeamInfo {
-        guard let e = try await entities([qid])[qid], e["missing"] == nil else { throw HTTP.Failure(message: "Wikidata ögesi bulunamadı: \(qid)") }
+        guard let e = try await entities([qid])[qid], e["missing"] == nil else { throw HTTP.Failure(message: L("Wikidata ögesi bulunamadı: \(qid)")) }
         let links = e["sitelinks"] as? [String: [String: Any]] ?? [:]
         var articles: [String: String] = [:]
         for lang in ["tr", "en"] { if let t = links["\(lang)wiki"]?["title"] as? String { articles[lang] = t } }

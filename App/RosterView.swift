@@ -25,7 +25,7 @@ struct RosterCard: View {
     var body: some View {
         Card {
             HStack {
-                Text(team.label.isEmpty ? "Takım seçilmedi" : team.label).font(.title3.weight(.semibold))
+                Text(team.label.isEmpty ? String(localized: "Takım seçilmedi") : team.label).font(.title3.weight(.semibold))
                 Spacer()
                 if loading { ProgressView().controlSize(.small) }
                 if let qid = team.qid {

@@ -63,7 +63,7 @@ struct Chip: View {
 }
 
 struct FieldLabel: View {
-    var text: String
-    init(_ text: String) { self.text = text }
+    var text: LocalizedStringKey
+    init(_ text: LocalizedStringKey) { self.text = text }
     var body: some View { Text(text).font(.caption).foregroundStyle(.secondary) }
 }

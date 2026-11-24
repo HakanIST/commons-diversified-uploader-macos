@@ -60,15 +60,16 @@ public actor CommonsClient {
             let r = try await post(["action": "login", "lgname": user, "lgpassword": password, "lgtoken": token])
             let login = r["login"] as? [String: Any]
             guard login?["result"] as? String == "Success" else {
-                throw HTTP.Failure(message: "Oturum açılamadı: \(login?["reason"] as? String ?? login?["result"] as? String ?? "bilinmeyen hata")")
+                let reason = login?["reason"] as? String ?? login?["result"] as? String ?? L("bilinmeyen hata")
+                throw HTTP.Failure(message: L("Oturum açılamadı: \(reason)"))
             }
         }
         let d = try await get(["action": "query", "meta": "userinfo|tokens", "uiprop": "rights", "type": "csrf"])
-        if let e = Self.apiError(d) { throw HTTP.Failure(message: "Oturum açılamadı: \(e)") }
+        if let e = Self.apiError(d) { throw HTTP.Failure(message: L("Oturum açılamadı: \(e)")) }
         let q = d["query"] as? [String: Any] ?? [:]
         let info = q["userinfo"] as? [String: Any] ?? [:]
-        guard info["anon"] == nil, let name = info["name"] as? String else { throw HTTP.Failure(message: "Oturum açılamadı: kimlik bilgisi kabul edilmedi") }
-        guard (info["rights"] as? [String] ?? []).contains("upload") else { throw HTTP.Failure(message: "Bu kimlik bilgisinin dosya yükleme izni yok") }
+        guard info["anon"] == nil, let name = info["name"] as? String else { throw HTTP.Failure(message: L("Oturum açılamadı: kimlik bilgisi kabul edilmedi")) }
+        guard (info["rights"] as? [String] ?? []).contains("upload") else { throw HTTP.Failure(message: L("Bu kimlik bilgisinin dosya yükleme izni yok")) }
         username = name
         csrf = (q["tokens"] as? [String: Any])?["csrftoken"] as? String
         return name
@@ -128,16 +129,16 @@ public actor CommonsClient {
         switch key {
         case "duplicate":
             let files = (warnings[key] as? [String])?.joined(separator: ", ") ?? ""
-            return "Aynı dosya Commons'ta zaten var: \(files)"
-        case "exists", "exists-normalized": return "Bu adla bir dosya zaten var"
-        case "was-deleted", "duplicate-archive": return "Bu dosya daha önce Commons'tan silinmiş"
-        default: return "Dosya adı kabul edilmedi"
+            return L("Aynı dosya Commons'ta zaten var: \(files)")
+        case "exists", "exists-normalized": return L("Bu adla bir dosya zaten var")
+        case "was-deleted", "duplicate-archive": return L("Bu dosya daha önce Commons'tan silinmiş")
+        default: return L("Dosya adı kabul edilmedi")
         }
     }
 
     /// Dosyayı parçalar hâlinde yükler. Engelleyici uyarı varsa yayımlamaz.
     public func upload(file: URL, filename: String, text: String, comment: String, progress: (@Sendable (Double) -> Void)? = nil) async throws -> UploadOutcome {
-        guard csrf != nil else { throw HTTP.Failure(message: "Önce Commons oturumu açın") }
+        guard csrf != nil else { throw HTTP.Failure(message: L("Önce Commons oturumu açın")) }
         let handle = try FileHandle(forReadingFrom: file)
         defer { try? handle.close() }
         let size = try FileManager.default.attributesOfItem(atPath: file.path)[.size] as? Int ?? 0
@@ -156,11 +157,12 @@ public actor CommonsClient {
             progress?(Double(offset) / Double(max(size, 1)))
         }
         if let reason = Self.describe(warnings) { return .blocked(reason: reason) }
-        guard let fileKey else { throw HTTP.Failure(message: "Yükleme başlatılamadı") }
+        guard let fileKey else { throw HTTP.Failure(message: L("Yükleme başlatılamadı")) }
         let r = try await uploadCall(["filekey": fileKey, "filename": filename, "text": text, "comment": comment])
         guard r["result"] as? String == "Success" else {
-            if let w = r["warnings"] as? [String: Any] { return .blocked(reason: Self.describe(w) ?? "Uyarı: \(w.keys.sorted().joined(separator: ", "))") }
-            throw HTTP.Failure(message: "Yükleme tamamlanamadı: \(r["result"] as? String ?? "?")")
+            if let w = r["warnings"] as? [String: Any] { return .blocked(reason: Self.describe(w) ?? L("Uyarı: \(w.keys.sorted().joined(separator: ", "))")) }
+            let result = r["result"] as? String ?? "?"
+            throw HTTP.Failure(message: L("Yükleme tamamlanamadı: \(result)"))
         }
         let title = "File:\(r["filename"] as? String ?? filename)"
         let q = try await get(["action": "query", "titles": title, "prop": "info", "inprop": "url"])
@@ -176,12 +178,12 @@ public actor CommonsClient {
             return ["type": "statement", "rank": "normal", "mainsnak": ["snaktype": "value", "property": "P180", "datavalue": ["type": "wikibase-entityid", "value": ["entity-type": "item", "numeric-id": n, "id": q]]]]
         }
         let data = String(data: try JSONSerialization.data(withJSONObject: ["claims": claims]), encoding: .utf8)!
-        let d = try await post(["action": "wbeditentity", "id": "M\(pageID)", "data": data, "token": csrf ?? "", "summary": "Görünen kişiler eklendi"])
+        let d = try await post(["action": "wbeditentity", "id": "M\(pageID)", "data": data, "token": csrf ?? "", "summary": "Added depicted people"])
         if let e = Self.apiError(d) { throw HTTP.Failure(message: e) }
     }
 
     public func createCategory(_ name: String, text: String) async throws {
-        let d = try await post(["action": "edit", "title": "Category:\(name)", "text": text, "createonly": "1", "summary": "Maç kategorisi oluşturuldu", "token": csrf ?? ""])
-        if let err = d["error"] as? [String: Any], err["code"] as? String != "articleexists" { throw HTTP.Failure(message: err["info"] as? String ?? "Kategori oluşturulamadı") }
+        let d = try await post(["action": "edit", "title": "Category:\(name)", "text": text, "createonly": "1", "summary": "Created match category", "token": csrf ?? ""])
+        if let err = d["error"] as? [String: Any], err["code"] as? String != "articleexists" { throw HTTP.Failure(message: err["info"] as? String ?? L("Kategori oluşturulamadı")) }
     }
 }

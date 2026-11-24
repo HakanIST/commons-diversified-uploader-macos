@@ -18,7 +18,7 @@ public enum ModelStore {
             request.setValue(HTTP.userAgent, forHTTPHeaderField: "User-Agent")
             let delegate = Delegate { fraction in progress((Double(i) + fraction) / Double(files.count), file) }
             let (temp, response) = try await URLSession.shared.download(for: request, delegate: delegate)
-            guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw HTTP.Failure(message: "Model indirilemedi: \(file)") }
+            guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw HTTP.Failure(message: L("Model indirilemedi: \(file)")) }
             try? FileManager.default.removeItem(at: target)
             try FileManager.default.moveItem(at: temp, to: target)
         }

@@ -75,7 +75,11 @@ public struct MatchInfo: Codable, Equatable, Sendable {
     public var extraCategories: [String] = []
     public var author = ""
     public var license = "cc-by-sa-4.0"
-    public var titleTemplate = "{oyuncular} {numaralar} - {maç} ({sıra})"
+    public var titleTemplate = MatchInfo.defaultTitleTemplate
+    /// Yeni projelerde arayüz diline göre Türkçe ya da İngilizce alan adları kullanılır; ikisi de her zaman geçerlidir.
+    public static var defaultTitleTemplate: String {
+        Bundle.main.preferredLocalizations.first == "tr" ? "{oyuncular} {numaralar} - {maç} ({sıra})" : "{players} {numbers} - {match} ({n})"
+    }
     public var teams: [Team] = [Team(key: "a"), Team(key: "b")]
     public init() {}
 }

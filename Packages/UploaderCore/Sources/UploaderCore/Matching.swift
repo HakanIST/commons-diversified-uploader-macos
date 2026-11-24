@@ -111,7 +111,7 @@ public enum Matcher {
 }
 
 public enum PageBuilder {
-    /// Şablon alanları: {oyuncular} {numaralar} {maç} {sıra}
+    /// Şablon alanları: {oyuncular} {numaralar} {maç} {sıra} ya da {players} {numbers} {match} {n}
     public static func title(template: String, players: [MatchedPlayer], matchTitle: String, seq: Int, ext: String) -> String {
         let shown = players.prefix(3)
         var t = template
@@ -119,6 +119,10 @@ public enum PageBuilder {
             .replacingOccurrences(of: "{numaralar}", with: shown.map(\.number).joined(separator: ", "))
             .replacingOccurrences(of: "{maç}", with: matchTitle)
             .replacingOccurrences(of: "{sıra}", with: String(seq))
+            .replacingOccurrences(of: "{players}", with: shown.map(\.name).joined(separator: ", "))
+            .replacingOccurrences(of: "{numbers}", with: shown.map(\.number).joined(separator: ", "))
+            .replacingOccurrences(of: "{match}", with: matchTitle)
+            .replacingOccurrences(of: "{n}", with: String(seq))
         t = t.replacingOccurrences(of: "[#<>\\[\\]|{}:/\\\\]", with: " ", options: .regularExpression)
             .replacingOccurrences(of: "\\(\\s*\\)", with: "", options: .regularExpression)
             .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)

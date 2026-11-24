@@ -11,7 +11,7 @@ let package = Package(
     ],
     targets: [
         .binaryTarget(name: "onnxruntime", path: "../../Frameworks/onnxruntime.xcframework"),
-        .target(name: "UploaderCore", dependencies: ["onnxruntime"]),
+        .target(name: "UploaderCore", dependencies: ["onnxruntime"], resources: [.process("Resources")]),
         .executableTarget(name: "cdu-cli", dependencies: ["UploaderCore"]),
         .testTarget(name: "UploaderCoreTests", dependencies: ["UploaderCore"]),
     ]

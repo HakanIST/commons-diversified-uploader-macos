@@ -133,7 +133,7 @@ final class FlorenceTokenizer {
     init(url: URL) throws {
         guard let root = try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any],
               let model = root["model"] as? [String: Any], let vocab = model["vocab"] as? [String: Int] else {
-            throw OrtError(description: "tokenizer.json okunamadı")
+            throw OrtError(description: L("tokenizer.json okunamadı"))
         }
         for (token, id) in vocab { idToToken[Int64(id)] = token }
         for added in root["added_tokens"] as? [[String: Any]] ?? [] {

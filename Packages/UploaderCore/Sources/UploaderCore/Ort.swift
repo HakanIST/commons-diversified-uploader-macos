@@ -16,7 +16,7 @@ private let api: UnsafePointer<OrtApi> = {
 @inline(__always)
 private func check(_ status: OpaquePointer?) throws {
     guard let status else { return }
-    let message = api.pointee.GetErrorMessage(status).map { String(cString: $0) } ?? "bilinmeyen hata"
+    let message = api.pointee.GetErrorMessage(status).map { String(cString: $0) } ?? L("bilinmeyen hata")
     api.pointee.ReleaseStatus(status)
     throw OrtError(description: message)
 }
