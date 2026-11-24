@@ -10,3 +10,4 @@ Fixtures/
 *.p8
 *.p12
 build-dev/
+build-mas/

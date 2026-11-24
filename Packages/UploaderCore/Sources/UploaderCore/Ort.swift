@@ -27,9 +27,13 @@ final class OrtEnvironment {
     let memoryInfo: OpaquePointer
 
     private init() {
+        // Kitaplık ortam oluşturulurken telemetriyi başlatır; bu yüzden önce ortam değişkeniyle kapatılır.
+        setenv("ORT_DISABLE_TELEMETRY", "1", 1)
         var e: OpaquePointer?
         try! check(api.pointee.CreateEnv(ORT_LOGGING_LEVEL_WARNING, "cdu", &e))
         env = e!
+        // Resmî derleme Microsoft'a kullanım telemetrisi gönderebilir; uygulama hiçbir veri göndermez.
+        try! check(api.pointee.DisableTelemetryEvents(env))
         var m: OpaquePointer?
         try! check(api.pointee.CreateCpuMemoryInfo(OrtArenaAllocator, OrtMemTypeDefault, &m))
         memoryInfo = m!

@@ -55,6 +55,13 @@ The model (about 1 GB) is downloaded from Hugging Face on first use.
 Commit messages follow the
 [Wikimedia commit message guidelines](https://www.mediawiki.org/wiki/Gerrit/Commit_message_guidelines).
 
+## Privacy
+
+The app talks only to Wikimedia sites (Commons, Wikidata, Wikipedia) and, once,
+to Hugging Face to download the model. Photos are analysed on the device.
+The usage telemetry built into the official ONNX Runtime binaries is switched
+off before the runtime starts.
+
 ## License
 
 [Apache License 2.0](LICENSE)
