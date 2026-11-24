@@ -57,6 +57,25 @@ case "match":
         let r = Matcher.match(analysis, teams: project.match.teams)
         print(name, r.players.map { "\($0.number) \($0.name)" }.joined(separator: ", "), r.unresolved.isEmpty ? "" : "| çözülemeyen: \(r.unresolved.map(\.number).joined(separator: ","))")
     }
+case "stash":
+    // cdu-cli stash <fotoğraf> <dosyaAdı>: kimlik bilgisini (JSON) standart girdiden okur, oturum açar ve dosyayı
+    // yayımlamadan yalnızca geçici alana gönderir. Yükleme yolunu Commons'ta iz bırakmadan sınamak içindir.
+    let input = FileHandle.standardInput.readDataToEndOfFile()
+    let auth = try JSONDecoder().decode(CommonsAuth.self, from: input)
+    if case .oauth(_, let tokens) = auth, tokens.needsRefresh { print("belirtecin süresi dolmak üzere; uygulamadan yeniden giriş yapın"); exit(3) }
+    let sem = DispatchSemaphore(value: 0)
+    Task {
+        do {
+            let client = CommonsClient(auth: auth)
+            let name = try await client.login()
+            print("oturum:", name.isEmpty ? "-" : "açıldı")
+            let start = Date()
+            let r = try await client.stashOnly(file: URL(fileURLWithPath: args[1]), filename: args[2])
+            print("geçici alana gönderildi:", r.stashed, "| uyarılar:", r.warnings.isEmpty ? "yok" : r.warnings.joined(separator: ","), "| süre:", Int(Date().timeIntervalSince(start)), "sn")
+        } catch { print("hata:", error.localizedDescription) }
+        sem.signal()
+    }
+    sem.wait()
 default:
     print("bilinmeyen komut"); exit(2)
 }

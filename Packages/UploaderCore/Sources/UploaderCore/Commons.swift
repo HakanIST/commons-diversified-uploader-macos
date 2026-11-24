@@ -155,8 +155,8 @@ public actor CommonsClient {
         }
     }
 
-    /// Dosyayı parçalar hâlinde yükler. Engelleyici uyarı varsa yayımlamaz.
-    public func upload(file: URL, filename: String, text: String, comment: String, progress: (@Sendable (Double) -> Void)? = nil) async throws -> UploadOutcome {
+    /// Dosyayı parçalar hâlinde Commons'ın geçici (yalnızca yükleyene görünen) alanına gönderir.
+    private func stash(file: URL, filename: String, progress: (@Sendable (Double) -> Void)?) async throws -> (fileKey: String?, warnings: [String: Any]) {
         guard csrf != nil else { throw HTTP.Failure(message: L("Önce Commons oturumu açın")) }
         let handle = try FileHandle(forReadingFrom: file)
         defer { try? handle.close() }
@@ -175,6 +175,19 @@ public actor CommonsClient {
             offset += chunk.count
             progress?(Double(offset) / Double(max(size, 1)))
         }
+        return (fileKey, warnings)
+    }
+
+    /// Yayımlamadan sınama: dosyayı yalnızca geçici alana gönderir ve Commons'ın uyarılarını döndürür.
+    /// Geçici dosyalar herkese açık değildir ve kendiliğinden silinir.
+    public func stashOnly(file: URL, filename: String) async throws -> (stashed: Bool, warnings: [String]) {
+        let (fileKey, warnings) = try await stash(file: file, filename: filename, progress: nil)
+        return (fileKey != nil, warnings.keys.sorted())
+    }
+
+    /// Dosyayı parçalar hâlinde yükler. Engelleyici uyarı varsa yayımlamaz.
+    public func upload(file: URL, filename: String, text: String, comment: String, progress: (@Sendable (Double) -> Void)? = nil) async throws -> UploadOutcome {
+        let (fileKey, warnings) = try await stash(file: file, filename: filename, progress: progress)
         if let reason = Self.describe(warnings) { return .blocked(reason: reason) }
         guard let fileKey else { throw HTTP.Failure(message: L("Yükleme başlatılamadı")) }
         let r = try await uploadCall(["filekey": fileKey, "filename": filename, "text": text, "comment": comment])
